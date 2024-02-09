@@ -9,5 +9,12 @@ export const isValidUUID = (id: string) => {
 };
 
 export const isValidUser = (username: string, age: number, hobbies: string[]) => {
-  return !username || typeof age !== "number" || !hobbies || !Array.isArray(hobbies);
+  return (
+    !username ||
+    typeof username !== "string" ||
+    typeof age !== "number" ||
+    !hobbies ||
+    !Array.isArray(hobbies) ||
+    !hobbies.every(hobby => typeof hobby === "string")
+  );
 };

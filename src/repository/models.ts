@@ -26,8 +26,8 @@ export const getUserById = async (_: IncomingMessage, res: ServerResponse, id: s
     }
   } catch (error) {
     console.error("Something went wrong.", error);
-    res.writeHead(StatusCode.badRequest, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: "Something went wrong." }));
+    res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ message: StatusCode.internalServerError }));
   }
 };
 
@@ -55,15 +55,15 @@ export const createUser = (req: IncomingMessage, res: ServerResponse) => {
           res.end(JSON.stringify(newUser));
         }
       } catch (error) {
-        console.error("Invalid JSON in request body.", error);
+        console.error("Invalid JSON in request body.");
         res.writeHead(StatusCode.badRequest, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ message: errorMessages.invalidBody }));
       }
     });
   } catch (error) {
-    console.error("Something went wrong in createUser function.", error);
-    res.writeHead(StatusCode.badRequest, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: errorMessages.internalError }));
+    console.error(errorMessages.internalServerError);
+    res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ message: errorMessages.internalServerError }));
   }
 };
 
@@ -105,9 +105,9 @@ export const updateUser = (req: IncomingMessage, res: ServerResponse, id: string
       }
     });
   } catch (error) {
-    console.error("Something went wrong in updateUser function.", error);
-    res.writeHead(StatusCode.badRequest, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: errorMessages.somethingWrong }));
+    console.error(errorMessages.internalServerError);
+    res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ message: errorMessages.internalServerError }));
   }
 };
 
@@ -131,9 +131,9 @@ export const deleteUser = (_: IncomingMessage, res: ServerResponse, id: string) 
       res.end();
     }
   } catch (error) {
-    console.error(errorMessages.somethingWrong, error);
-    res.writeHead(StatusCode.badRequest, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: errorMessages.somethingWrong }));
+    console.error(errorMessages.internalServerError);
+    res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ message: errorMessages.internalServerError }));
   }
 };
 
@@ -142,14 +142,14 @@ export const methodNotAllowed = (res: ServerResponse) => {
     res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: errorMessages.notFound }));
   } catch (error) {
-    console.error(errorMessages.somethingWrong);
-    res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: errorMessages.somethingWrong }));
+   console.error(errorMessages.internalServerError);
+    res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ message: errorMessages.internalServerError }));
   }
 };
 
 export const handleError = (res: ServerResponse) => {
-  console.error(errorMessages.internalServerError);
-  res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
-  res.end(JSON.stringify({ message: errorMessages.internalServerError }));
+  console.error(errorMessages.notFound);
+  res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
+  res.end(JSON.stringify({ message: errorMessages.notFound }));
 };

@@ -1,8 +1,9 @@
 import http from "http";
 import { routes } from "./routes/route";
 import "dotenv/config";
-import { port } from "./utils/const";
+
+const severPort = process.env.PORT || 4000;
 
 export const server = http
   .createServer(routes)
-  .listen(port, () => console.log(`Server ${port} open`));
+  .listen(severPort, () => console.log(`Server ${severPort} open`));

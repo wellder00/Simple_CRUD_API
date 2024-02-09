@@ -1,4 +1,3 @@
-export const port = process.env.PORT || 4000;
 
 export const errorMessages = {
   invalidUserId: "Invalid user ID.",
@@ -9,7 +8,7 @@ export const errorMessages = {
   internalError: "Something went wrong.",
   somethingWrong: "Something went wrong.",
   notFound: "Not found",
-  internalServerError: "Internal Server Error. Please try again later."
+  internalServerError: "Internal Server Error. Please try again later.",
 };
 
 export const enum StatusCode {
