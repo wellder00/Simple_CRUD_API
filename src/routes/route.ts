@@ -14,6 +14,7 @@ import { isValidApiAndUsers } from "../utils/validate";
 export const routes = async (req: IncomingMessage, res: ServerResponse) => {
   res.setHeader("Content-Type", "application/json");
   console.log(`Worker ${process.pid} start`);
+  res.setHeader('X-Worker-PID', process.pid);
   const { api, users, id, rest } = getUrlParts(req.url);
 
   if (isValidApiAndUsers(api, users, rest)) {

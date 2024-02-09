@@ -5,8 +5,14 @@ import { v4 as uuidv4, validate as uuidValidate } from "uuid";
 import { isValidUUID, isValidUser } from "../utils/validate";
 
 export const getAllUsers = async (_: IncomingMessage, res: ServerResponse) => {
-  res.writeHead(StatusCode.ok, { "Content-Type": "application/json" });
-  res.end(JSON.stringify(users));
+  try {
+    res.writeHead(StatusCode.ok, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(users));
+  } catch (error) {
+    console.error(errorMessages.internalServerError);
+    res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ message: errorMessages.internalServerError }));
+  }
 };
 
 export const getUserById = async (_: IncomingMessage, res: ServerResponse, id: string) => {
@@ -142,7 +148,7 @@ export const methodNotAllowed = (res: ServerResponse) => {
     res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: errorMessages.notFound }));
   } catch (error) {
-   console.error(errorMessages.internalServerError);
+    console.error(errorMessages.internalServerError);
     res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: errorMessages.internalServerError }));
   }
