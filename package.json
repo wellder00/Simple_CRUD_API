@@ -6,7 +6,21 @@
   "scripts": {
     "start:dev": "nodemon",
     "start:prod": "tsc && node ./dist/index.js",
-    "start:multi": "tsc && node ./dist/server.js"
+    "start:multi": "tsc && node ./dist/server.js",
+    "test": "jest"
+  },
+  "jest": {
+    "verbose": true,
+    "silent": true,
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "rootDir": "./test/",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    }
   },
   "repository": {
     "type": "git",
