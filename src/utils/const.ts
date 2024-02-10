@@ -19,3 +19,10 @@ export const enum StatusCode {
   notFound = 404,
   internalServerError = 500,
 }
+
+export const consoleColors = {
+  green: "\x1b[32m%s\x1b[0m",
+  turquoise: "\x1b[36m%s\x1b[0m",
+  blue: "\x1b[34m%s\x1b[0m",
+  red: "\x1b[31m%s\x1b[0m",
+};

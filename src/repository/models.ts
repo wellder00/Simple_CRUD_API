@@ -1,13 +1,15 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { users } from "../db/users";
+import { usersDb } from "../db/users";
 import { StatusCode, errorMessages } from "../utils/const";
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
 import { isValidUUID, isValidUser } from "../utils/validate";
+import { broadcastUpdate } from "../utils/updateObj";
+
 
 export const getAllUsers = async (_: IncomingMessage, res: ServerResponse) => {
   try {
     res.writeHead(StatusCode.ok, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(users));
+    res.end(JSON.stringify(usersDb));
   } catch (error) {
     console.error(errorMessages.internalServerError);
     res.writeHead(StatusCode.internalServerError, { "Content-Type": "application/json" });
@@ -22,7 +24,7 @@ export const getUserById = async (_: IncomingMessage, res: ServerResponse, id: s
       res.end(JSON.stringify({ message: errorMessages.invalidUserId }));
       return;
     }
-    const user = users.find((user) => user.id === id);
+    const user = usersDb.find((user) => user.id === id);
     if (!user) {
       res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ message: errorMessages.userNotFound }));
@@ -37,7 +39,7 @@ export const getUserById = async (_: IncomingMessage, res: ServerResponse, id: s
   }
 };
 
-export const createUser = (req: IncomingMessage, res: ServerResponse) => {
+export const createUser = async(req: IncomingMessage, res: ServerResponse) => {
   try {
     let body = "";
     req.on("data", (chunk) => {
@@ -56,7 +58,9 @@ export const createUser = (req: IncomingMessage, res: ServerResponse) => {
             age,
             hobbies,
           };
-          users.push(newUser);
+          
+          usersDb.push(newUser);
+          broadcastUpdate(usersDb)
           res.writeHead(StatusCode.created, { "Content-Type": "application/json" });
           res.end(JSON.stringify(newUser));
         }
@@ -73,14 +77,14 @@ export const createUser = (req: IncomingMessage, res: ServerResponse) => {
   }
 };
 
-export const updateUser = (req: IncomingMessage, res: ServerResponse, id: string) => {
+export const updateUser = async(req: IncomingMessage, res: ServerResponse, id: string) => {
   try {
     if (!uuidValidate(id)) {
       res.writeHead(StatusCode.badRequest, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ message: errorMessages.invalidUserId }));
       return;
     }
-    const userIndex = users.findIndex((user) => user.id === id);
+    const userIndex = usersDb.findIndex((user) => user.id === id);
     if (userIndex === -1) {
       res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ message: errorMessages.userNotFound }));
@@ -100,9 +104,10 @@ export const updateUser = (req: IncomingMessage, res: ServerResponse, id: string
           res.end(JSON.stringify({ message: errorMessages.missingFields }));
         } else {
           const updates = JSON.parse(body);
-          users[userIndex] = { ...users[userIndex], ...updates };
+          usersDb[userIndex] = { ...usersDb[userIndex], ...updates };
+          broadcastUpdate(usersDb)
           res.writeHead(StatusCode.ok, { "Content-Type": "application/json" });
-          res.end(JSON.stringify(users[userIndex]));
+          res.end(JSON.stringify(usersDb[userIndex]));
         }
       } catch (error) {
         console.error("Invalid JSON in request body.", error);
@@ -117,7 +122,7 @@ export const updateUser = (req: IncomingMessage, res: ServerResponse, id: string
   }
 };
 
-export const deleteUser = (_: IncomingMessage, res: ServerResponse, id: string) => {
+export const deleteUser = async(_: IncomingMessage, res: ServerResponse, id: string) => {
   try {
     const userId = id;
 
@@ -127,12 +132,13 @@ export const deleteUser = (_: IncomingMessage, res: ServerResponse, id: string) 
       return;
     }
 
-    const userIndex = users.findIndex((user) => user.id === userId);
+    const userIndex = usersDb.findIndex((user) => user.id === userId);
     if (userIndex === -1) {
       res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ message: errorMessages.userNotFound }));
     } else {
-      users.splice(userIndex, 1);
+      usersDb.splice(userIndex, 1);
+      broadcastUpdate(usersDb)
       res.writeHead(StatusCode.noContent);
       res.end();
     }
@@ -143,7 +149,7 @@ export const deleteUser = (_: IncomingMessage, res: ServerResponse, id: string) 
   }
 };
 
-export const methodNotAllowed = (res: ServerResponse) => {
+export const methodNotAllowed = async(res: ServerResponse) => {
   try {
     res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: errorMessages.notFound }));
@@ -154,8 +160,10 @@ export const methodNotAllowed = (res: ServerResponse) => {
   }
 };
 
-export const handleError = (res: ServerResponse) => {
+export const handleError = async(res: ServerResponse) => {
   console.error(errorMessages.notFound);
   res.writeHead(StatusCode.notFound, { "Content-Type": "application/json" });
   res.end(JSON.stringify({ message: errorMessages.notFound }));
 };
+
+
